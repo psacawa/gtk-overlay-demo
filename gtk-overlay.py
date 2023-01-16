@@ -13,11 +13,10 @@ from gi.repository import Gtk  # type: ignore
 
 # stub
 def on_button_clicked(widget):
-    logging.info("on_button_clicked")
+    logging.info(f"on_button_clicked from {widget}")
 
 
-handlers = {str(f): f for f in [on_button_clicked]}
-
+handlers = {f.__name__: f for f in [on_button_clicked]}
 
 def draw_hint(x, y, text, ctx: cairo.Context, padding=5, font_size=15):
 
@@ -76,16 +75,19 @@ def inject_overlay(window):
 
 def main():
     builder = Gtk.Builder()
-    builder.add_from_file("./overlay.ui")
+    builder.add_from_file("./gtk-overlay.ui")
+
+    builder.connect_signals(handlers)
 
     window = builder.get_object("main-window")
     window.connect("destroy", Gtk.main_quit)
+    
 
     #  blokuje kliknięcia...
     inject_overlay(window)
 
     provider = Gtk.CssProvider()
-    provider.load_from_path("./overlay.css")
+    provider.load_from_path("./gtk-overlay.css")
     apply_css(window, provider)
 
     window.show_all()
